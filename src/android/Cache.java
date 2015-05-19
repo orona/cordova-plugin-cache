@@ -30,6 +30,8 @@ import org.json.JSONException;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.util.Log;
+import java.io.File;
+import java.lang.System;
 
 @TargetApi(19)
 public class Cache extends CordovaPlugin
@@ -59,18 +61,15 @@ public class Cache extends CordovaPlugin
 		        cordova.getActivity().runOnUiThread( new Runnable() {
 		            public void run()
 					{
-						try
-						{
-							// clear the cache
-							self.webView.clearCache(true);
-							
-							// send success result to cordova
+						File dir = cordova.getActivity().getCacheDir();
+						if (dir != null && dir.isDirectory()) {
+							webView.clearCache();
+							dir.delete();
+							System.gc();
 							PluginResult result = new PluginResult(PluginResult.Status.OK);
 							result.setKeepCallback(false); 
 							self.callbackContext.sendPluginResult(result);
-						}
-						catch( Exception e )
-						{
+						}else{
 							String msg = "Error while clearing webview cache.";
 							Log.e(LOG_TAG, msg );
 							
